@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Advanced Posture Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 25%, #16213e 50%, #1a1a2e 75%, #0a0a1a 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #e8e9f3;
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 60%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .signup-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .signup-form {
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.95) 50%, 
+                rgba(15, 23, 42, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.05) 50%, transparent 70%);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .signup-form h2 {
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .signup-form p {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+            color: #94a3b8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            color: #e8e9f3;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .signup-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-panel {
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.95) 50%, 
+                rgba(15, 23, 42, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-header h3 {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-label {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #3b82f6;
+        }
+
+        .user-list {
+            margin-top: 30px;
+        }
+
+        .user-list h4 {
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            color: #e8e9f3;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .user-status {
+            color: #94a3b8;
+            font-size: 0.85em;
+        }
+
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-left: auto;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .signup-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .signup-form, .stats-panel {
+                padding: 30px 20px;
+            }
+        }
+
+        .live-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .live-counter .counter-number {
+            font-size: 2em;
+            font-weight: 800;
+            color: #10b981;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .live-counter .counter-label {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-form">
+            <h2>Join Our Community</h2>
+            <p>Start your posture improvement journey today</p>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                
+                <button type="submit" class="signup-btn">Create Account</button>
+            </form>
+        </div>
+        
+        <div class="stats-panel">
+            <div class="stats-header">
+                <h3>Community Stats</h3>
+                <p style="color: #94a3b8; margin: 0;">Real-time user activity</p>
+            </div>
+            
+            <div class="live-counter">
+                <span class="counter-number" id="liveUsers">247</span>
+                <span class="counter-label">Users Online Now</span>
+            </div>
+            
+            <div class="stat-item">
+                <span class="stat-label">Total Users</span>
+                <span class="stat-value" id="totalUsers">12,847</span>
+            </div>
+            
+            <div class="stat-item">
+                <span class="stat-label">Sessions Today</span>
+                <span class="stat-value" id="todaySessions">3,291</span>
+            </div>
+            
+            <div class="stat-item">
+                <span class="stat-label">Posture Improvements</span>
+                <span class="stat-value" id="improvements">89,234</span>
+            </div>
+            
+            <div class="stat-item">
+                <span class="stat-label">Average Score</span>
+                <span class="stat-value">87%</span>
+            </div>
+            
+            <div class="user-list">
+                <h4>Recently Joined</h4>
+                
+                <div class="user-item">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">Alex Chen</div>
+                        <div class="user-status">Joined 2 minutes ago</div>
+                    </div>
+                    <div class="online-indicator"></div>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar">S</div>
+                    <div class="user-info">
+                        <div class="user-name">Sarah Johnson</div>
+                        <div class="user-status">Joined 8 minutes ago</div>
+                    </div>
+                    <div class="online-indicator"></div>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar">M</div>
+                    <div class="user-info">
+                        <div class="user-name">Mike Rodriguez</div>
+                        <div class="user-status">Joined 15 minutes ago</div>
+                    </div>
+                    <div class="online-indicator"></div>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar">E</div>
+                    <div class="user-info">
+                        <div class="user-name">Emily Davis</div>
+                        <div class="user-status">Joined 23 minutes ago</div>
+                    </div>
+                    <div class="online-indicator"></div>
+                </div>
+                
+                <div class="user-item">
+                    <div class="user-avatar">J</div>
+                    <div class="user-info">
+                        <div class="user-name">James Wilson</div>
+                        <div class="user-status">Joined 1 hour ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate live user count updates
+        let liveUsersCount = 247;
+        let totalUsersCount = 12847;
+        let todaySessionsCount = 3291;
+        let improvementsCount = 89234;
+        
+        function updateLiveStats() {
+            // Randomly fluctuate online users (between 200-300)
+            liveUsersCount += Math.floor(Math.random() * 21) - 10;
+            if (liveUsersCount < 200) liveUsersCount = 200;
+            if (liveUsersCount > 300) liveUsersCount = 300;
+            
+            // Slowly increase total users
+            if (Math.random() < 0.3) {
+                totalUsersCount += Math.floor(Math.random() * 3) + 1;
+            }
+            
+            // Increase today's sessions
+            if (Math.random() < 0.4) {
+                todaySessionsCount += Math.floor(Math.random() * 5) + 1;
+            }
+            
+            // Increase improvements
+            if (Math.random() < 0.2) {
+                improvementsCount += Math.floor(Math.random() * 10) + 1;
+            }
+            
+            document.getElementById('liveUsers').textContent = liveUsersCount;
+            document.getElementById('totalUsers').textContent = totalUsersCount.toLocaleString();
+            document.getElementById('todaySessions').textContent = todaySessionsCount.toLocaleString();
+            document.getElementById('improvements').textContent = improvementsCount.toLocaleString();
+        }
+        
+        // Update stats every 3-8 seconds
+        function scheduleNextUpdate() {
+            setTimeout(() => {
+                updateLiveStats();
+                scheduleNextUpdate();
+            }, Math.random() * 5000 + 3000);
+        }
+        
+        scheduleNextUpdate();
+        
+        // Add new users periodically
+        const fakeNames = [
+            'David Thompson', 'Lisa Wang', 'Robert Kim', 'Amanda Taylor', 'Chris Brown',
+            'Jessica Lee', 'Kevin Martinez', 'Rachel Green', 'Tom Anderson', 'Maria Garcia',
+            'Steven Clark', 'Nicole White', 'Daniel Lewis', 'Jennifer Hall', 'Mark Young'
+        ];
+        
+        function addNewUser() {
+            const userList = document.querySelector('.user-list');
+            const userItems = userList.querySelectorAll('.user-item');
+            
+            // Remove the last user if we have 5 or more
+            if (userItems.length >= 5) {
+                userItems[userItems.length - 1].remove();
+            }
+            
+            // Create new user
+            const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+            const initial = name.charAt(0);
+            
+            const newUser = document.createElement('div');
+            newUser.className = 'user-item';
+            newUser.style.opacity = '0';
+            newUser.innerHTML = `
+                <div class="user-avatar">${initial}</div>
+                <div class="user-info">
+                    <div class="user-name">${name}</div>
+                    <div class="user-status">Just joined</div>
+                </div>
+                <div class="online-indicator"></div>
+            `;
+            
+            // Insert at the beginning
+            const firstUser = userList.querySelector('.user-item');
+            if (firstUser) {
+                firstUser.parentNode.insertBefore(newUser, firstUser);
+            } else {
+                userList.appendChild(newUser);
+            }
+            
+            // Fade in animation
+            setTimeout(() => {
+                newUser.style.transition = 'opacity 0.5s ease';
+                newUser.style.opacity = '1';
+            }, 100);
+            
+            // Update timestamps for existing users
+            updateUserTimestamps();
+        }
+        
+        function updateUserTimestamps() {
+            const userItems = document.querySelectorAll('.user-item');
+            const timestamps = ['Just joined', '5 minutes ago', '12 minutes ago', '28 minutes ago', '1 hour ago'];
+            
+            userItems.forEach((item, index) => {
+                const statusElement = item.querySelector('.user-status');
+                if (index < timestamps.length) {
+                    statusElement.textContent = timestamps[index];
+                }
+            });
+        }
+        
+        // Add new user every 15-30 seconds
+        setInterval(addNewUser, Math.random() * 15000 + 15000);
+        
+        // Handle form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.querySelector('.signup-btn');
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Account created successfully! Welcome to the community!');
+                submitBtn.textContent = 'Account Created!';
+                submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                // Reset form
+                setTimeout(() => {
+                    this.reset();
+                    submitBtn.textContent = 'Create Account';
+                    submitBtn.disabled = false;
+                    submitBtn.style.background = 'linear-gradient(135deg, #3b82f6, #8b5cf6)';
+                }, 2000);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.99 0.005 106.423);
+  --foreground: oklch(0.09 0.005 285.882);
+  --card: oklch(0.99 0.005 106.423);
+  --card-foreground: oklch(0.09 0.005 285.882);
+  --popover: oklch(0.99 0.005 106.423);
+  --popover-foreground: oklch(0.09 0.005 285.882);
+  --primary: oklch(0.7 0.191 275.75);
+  --primary-foreground: oklch(0.99 0.005 106.423);
+  --secondary: oklch(0.96 0.015 106.423);
+  --secondary-foreground: oklch(0.09 0.005 285.882);
+  --muted: oklch(0.96 0.015 106.423);
+  --muted-foreground: oklch(0.45 0.015 285.882);
+  --accent: oklch(0.7 0.191 275.75);
+  --accent-foreground: oklch(0.99 0.005 106.423);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.005 106.423);
+  --border: oklch(0.92 0.015 106.423);
+  --input: oklch(0.92 0.015 106.423);
+  --ring: oklch(0.7 0.191 275.75);
+  --chart-1: oklch(0.7 0.191 275.75);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.99 0.005 106.423);
+  --sidebar-foreground: oklch(0.09 0.005 285.882);
+  --sidebar-primary: oklch(0.7 0.191 275.75);
+  --sidebar-primary-foreground: oklch(0.99 0.005 106.423);
+  --sidebar-accent: oklch(0.96 0.015 106.423);
+  --sidebar-accent-foreground: oklch(0.09 0.005 285.882);
+  --sidebar-border: oklch(0.92 0.015 106.423);
+  --sidebar-ring: oklch(0.7 0.191 275.75);
+}
+
+.dark {
+  --background: oklch(0.09 0.005 285.882);
+  --foreground: oklch(0.99 0.005 106.423);
+  --card: oklch(0.09 0.005 285.882);
+  --card-foreground: oklch(0.99 0.005 106.423);
+  --popover: oklch(0.09 0.005 285.882);
+  --popover-foreground: oklch(0.99 0.005 106.423);
+  --primary: oklch(0.8 0.191 275.75);
+  --primary-foreground: oklch(0.09 0.005 285.882);
+  --secondary: oklch(0.15 0.015 285.882);
+  --secondary-foreground: oklch(0.99 0.005 106.423);
+  --muted: oklch(0.15 0.015 285.882);
+  --muted-foreground: oklch(0.65 0.015 106.423);
+  --accent: oklch(0.8 0.191 275.75);
+  --accent-foreground: oklch(0.09 0.005 285.882);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.005 106.423);
+  --border: oklch(0.15 0.015 285.882);
+  --input: oklch(0.15 0.015 285.882);
+  --ring: oklch(0.8 0.191 275.75);
+  --sidebar: oklch(0.09 0.005 285.882);
+  --sidebar-foreground: oklch(0.99 0.005 106.423);
+  --sidebar-primary: oklch(0.8 0.191 275.75);
+  --sidebar-primary-foreground: oklch(0.09 0.005 285.882);
+  --sidebar-accent: oklch(0.15 0.015 285.882);
+  --sidebar-accent-foreground: oklch(0.99 0.005 106.423);
+  --sidebar-border: oklch(0.15 0.015 285.882);
+  --sidebar-ring: oklch(0.8 0.191 275.75);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added smooth scroll animations and custom keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Enhanced directional scroll animations for journey effect */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Enhanced dramatic scroll animations with slower timing and bigger movements */
+@keyframes slideInLeftDramatic {
+  from {
+    opacity: 0;
+    transform: translateX(-150px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideInRightDramatic {
+  from {
+    opacity: 0;
+    transform: translateX(150px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideInUpDramatic {
+  from {
+    opacity: 0;
+    transform: translateY(120px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInDownDramatic {
+  from {
+    opacity: 0;
+    transform: translateY(-120px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes scaleInDramatic {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(5deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes rotateInDramatic {
+  from {
+    opacity: 0;
+    transform: rotate(-20deg) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes fadeInDramatic {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.8s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.8s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Directional scroll reveal classes */
+.scroll-reveal.slide-in-left {
+  transform: translateX(-100px);
+}
+
+.scroll-reveal.slide-in-left.revealed {
+  animation: slideInLeft 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.slide-in-right {
+  transform: translateX(100px);
+}
+
+.scroll-reveal.slide-in-right.revealed {
+  animation: slideInRight 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.slide-in-up {
+  transform: translateY(80px);
+}
+
+.scroll-reveal.slide-in-up.revealed {
+  animation: slideInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.slide-in-down {
+  transform: translateY(-80px);
+}
+
+.scroll-reveal.slide-in-down.revealed {
+  animation: slideInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.scale-in {
+  transform: scale(0.8);
+}
+
+.scroll-reveal.scale-in.revealed {
+  animation: scaleIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.rotate-in {
+  transform: rotate(-10deg) scale(0.9);
+}
+
+.scroll-reveal.rotate-in.revealed {
+  animation: rotateIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Updated dramatic scroll reveal classes with slower timing */
+.scroll-reveal.slide-in-left-dramatic {
+  opacity: 0;
+  transform: translateX(-150px) scale(0.8);
+}
+
+.scroll-reveal.slide-in-left-dramatic.revealed {
+  animation: slideInLeftDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.slide-in-right-dramatic {
+  opacity: 0;
+  transform: translateX(150px) scale(0.8);
+}
+
+.scroll-reveal.slide-in-right-dramatic.revealed {
+  animation: slideInRightDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.slide-in-up-dramatic {
+  opacity: 0;
+  transform: translateY(120px) scale(0.8);
+}
+
+.scroll-reveal.slide-in-up-dramatic.revealed {
+  animation: slideInUpDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.slide-in-down-dramatic {
+  opacity: 0;
+  transform: translateY(-120px) scale(0.8);
+}
+
+.scroll-reveal.slide-in-down-dramatic.revealed {
+  animation: slideInDownDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.scale-in-dramatic {
+  opacity: 0;
+  transform: scale(0.5) rotate(5deg);
+}
+
+.scroll-reveal.scale-in-dramatic.revealed {
+  animation: scaleInDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.rotate-in-dramatic {
+  opacity: 0;
+  transform: rotate(-20deg) scale(0.7);
+}
+
+.scroll-reveal.rotate-in-dramatic.revealed {
+  animation: rotateInDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-reveal.fade-in-dramatic {
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(5px);
+}
+
+.scroll-reveal.fade-in-dramatic.revealed {
+  animation: fadeInDramatic 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced hover effects for interactive elements */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient text animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(-45deg, #8b5cf6, #3b82f6, #06b6d4, #10b981);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-custom {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
