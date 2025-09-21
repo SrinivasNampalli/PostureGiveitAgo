@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import PostureAnalyzer from "@/components/PostureAnalyzer"
+import Link from "next/link"
 import {
   ArrowRight,
   Target,
@@ -137,6 +138,85 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Quick Navigation Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 scroll-reveal slide-in-down-dramatic">
+              Explore <span className="text-primary">Everything</span> We Offer
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto scroll-reveal fade-in-dramatic">
+              From workout videos to progress tracking, discover all the tools you need for your fitness journey
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Link href="/exercises">
+              <Card className="p-8 text-center hover:scale-105 transition-all duration-300 cursor-pointer scroll-reveal slide-in-left-dramatic">
+                <div className="text-primary mb-6">
+                  <Dumbbell className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Exercise Library</h3>
+                <p className="text-muted-foreground mb-6">
+                  150+ workout videos with expert instruction and form guidance. From beginner to advanced levels.
+                </p>
+                <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
+                  <span>🎥 150+ Videos</span>
+                  <span>👥 2.1K Users</span>
+                  <span>⭐ 4.8 Rating</span>
+                </div>
+                <Button className="w-full mt-6">
+                  Explore Exercises
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Card>
+            </Link>
+
+            <Link href="/analytics">
+              <Card className="p-8 text-center hover:scale-105 transition-all duration-300 cursor-pointer scroll-reveal slide-in-up-dramatic">
+                <div className="text-primary mb-6">
+                  <BarChart3 className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Progress Analytics</h3>
+                <p className="text-muted-foreground mb-6">
+                  Detailed insights into your fitness journey with comprehensive charts and progress tracking.
+                </p>
+                <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
+                  <span>📊 Live Data</span>
+                  <span>🏆 Achievements</span>
+                  <span>📈 Trends</span>
+                </div>
+                <Button className="w-full mt-6">
+                  View Analytics
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Card>
+            </Link>
+
+            <Link href="/community">
+              <Card className="p-8 text-center hover:scale-105 transition-all duration-300 cursor-pointer scroll-reveal slide-in-right-dramatic">
+                <div className="text-primary mb-6">
+                  <Users className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Community Hub</h3>
+                <p className="text-muted-foreground mb-6">
+                  Connect with 12.8K+ fitness enthusiasts, join challenges, and share your achievements.
+                </p>
+                <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
+                  <span>👥 12.8K Members</span>
+                  <span>🏆 24 Challenges</span>
+                  <span>🌍 89 Countries</span>
+                </div>
+                <Button className="w-full mt-6">
+                  Join Community
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Posture Analysis Section */}
       <section id="posture" className="py-40 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-7xl mx-auto">
@@ -263,10 +343,12 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold mb-4">{exercise.title}</h3>
                   <div className="text-5xl font-bold text-primary mb-4">{exercise.count}</div>
                   <p className="text-muted-foreground mb-6">{exercise.status}</p>
-                  <Button className="w-full">
-                    <Camera className="w-4 h-4 mr-2" />
-                    Start {exercise.title}
-                  </Button>
+                  <Link href="/exercises">
+                    <Button className="w-full">
+                      <Camera className="w-4 h-4 mr-2" />
+                      Start {exercise.title}
+                    </Button>
+                  </Link>
                 </div>
               </Card>
             ))}
@@ -356,10 +438,12 @@ export default function HomePage() {
               </div>
 
               <div className="flex gap-4">
-                <Button size="lg">
-                  <BarChart3 className="w-5 h-5 mr-2" />
-                  View Full Analytics
-                </Button>
+                <Link href="/analytics">
+                  <Button size="lg">
+                    <BarChart3 className="w-5 h-5 mr-2" />
+                    View Full Analytics
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg">
                   Export Data
                 </Button>
@@ -494,10 +578,12 @@ export default function HomePage() {
                   <Camera className="w-5 h-5 mr-2" />
                   Start Free Trial
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Users className="w-5 h-5 mr-2" />
-                  Join Community
-                </Button>
+                <Link href="/community">
+                  <Button variant="outline" size="lg">
+                    <Users className="w-5 h-5 mr-2" />
+                    Join Community
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

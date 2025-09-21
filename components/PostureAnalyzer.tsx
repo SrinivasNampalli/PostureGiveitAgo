@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useSessionTracker } from "@/contexts/AnalyticsContext"
 import { Camera, Square, Target, RotateCcw, Play, Pause, Dumbbell, Timer, FileText, X, Download, AlertTriangle, BarChart3 } from "lucide-react"
 
 declare global {
@@ -58,6 +59,7 @@ interface ExerciseState {
 }
 
 export default function PostureAnalyzer() {
+  const { startSession } = useSessionTracker()
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isActive, setIsActive] = useState(false)
@@ -83,6 +85,7 @@ export default function PostureAnalyzer() {
     report: null as PostureReport | null
   })
   const [showGraph, setShowGraph] = useState(false)
+  const [sessionTracker, setSessionTracker] = useState<any>(null)
 
   const poseRef = useRef<any>(null)
   const cameraRef = useRef<any>(null)
@@ -808,6 +811,10 @@ export default function PostureAnalyzer() {
       setStatus("Camera active - Position yourself in view")
       setIsLoading(false)
 
+      // Start session tracking
+      const tracker = startSession(currentMode)
+      setSessionTracker(tracker)
+
       // Initialize data collection for posture mode
       if (currentMode === 'posture') {
         setDataCollection({
@@ -833,6 +840,36 @@ export default function PostureAnalyzer() {
 
   const stopCamera = () => {
     try {
+      // Complete session tracking before stopping
+      if (sessionTracker) {
+        let score = 0
+        let improvements: string[] = []
+        let exerciseCount = 0
+        let formQuality = 0
+
+        if (currentMode === 'posture' && metrics) {
+          score = metrics.score
+          improvements = ["Session completed"]
+        } else if (currentMode === 'pushup') {
+          score = exerciseState.formQuality || 75
+          exerciseCount = exerciseState.pushupCount
+          formQuality = exerciseState.formQuality
+          improvements = [`Completed ${exerciseState.pushupCount} push-ups`]
+        } else if (currentMode === 'squat') {
+          score = exerciseState.formQuality || 75
+          exerciseCount = exerciseState.squatCount
+          formQuality = exerciseState.formQuality
+          improvements = [`Completed ${exerciseState.squatCount} squats`]
+        } else if (currentMode === 'plank') {
+          score = exerciseState.formQuality || 75
+          formQuality = exerciseState.formQuality
+          improvements = [`Held plank for ${formatTime(exerciseState.plankTime)}`]
+        }
+
+        sessionTracker.complete(score, improvements, exerciseCount, formQuality)
+        setSessionTracker(null)
+      }
+
       // Stop camera stream
       if (cameraRef.current) {
         cameraRef.current.stop()
