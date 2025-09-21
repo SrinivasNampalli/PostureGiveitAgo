@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dir app)",
       "Bash(npm run dev:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
