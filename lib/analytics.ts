@@ -1,13 +1,15 @@
 // Analytics service for tracking real user data
 export interface SessionData {
   id: string
-  type: 'posture' | 'pushup' | 'squat' | 'plank'
+  type: 'posture' | 'pushup' | 'squat' | 'plank' | 'workspace'
   startTime: Date
   endTime: Date
   duration: number // in seconds
   score: number
   exerciseCount?: number
   formQuality?: number
+  workspaceIssues?: number // Number of issues found
+  workspaceRecommendations?: number // Number of recommendations
   improvements: string[]
   date: string // YYYY-MM-DD format
 }
@@ -251,6 +253,27 @@ class AnalyticsService {
         description: 'Achieve a perfect 100 score',
         icon: '⭐',
         target: 100
+      },
+      {
+        id: 'workspace-optimizer',
+        title: 'Workspace Optimizer',
+        description: 'Complete your first workspace analysis',
+        icon: '🏠',
+        target: 1
+      },
+      {
+        id: 'ergo-expert',
+        title: 'Ergonomic Expert',
+        description: 'Achieve 90%+ workspace score',
+        icon: '🪑',
+        target: 90
+      },
+      {
+        id: 'design-guru',
+        title: 'Design Guru',
+        description: 'Complete 10 workspace analyses',
+        icon: '🎨',
+        target: 10
       }
     ]
 
@@ -288,6 +311,18 @@ class AnalyticsService {
           case 'perfectionist':
             const perfectSessions = sessions.filter(s => s.score >= 100)
             progress = perfectSessions.length > 0 ? achDef.target : 0
+            break
+          case 'workspace-optimizer':
+            const workspaceSessions = sessions.filter(s => s.type === 'workspace')
+            progress = Math.min(workspaceSessions.length, achDef.target)
+            break
+          case 'ergo-expert':
+            const workspaceHighScores = sessions.filter(s => s.type === 'workspace' && s.score >= 90)
+            progress = workspaceHighScores.length > 0 ? achDef.target : 0
+            break
+          case 'design-guru':
+            const workspaceAnalyses = sessions.filter(s => s.type === 'workspace')
+            progress = Math.min(workspaceAnalyses.length, achDef.target)
             break
         }
 

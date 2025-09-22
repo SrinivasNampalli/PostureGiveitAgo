@@ -21,6 +21,7 @@ import {
   Eye,
   LogOut,
   User,
+  Home,
 } from "lucide-react"
 
 export default function HomePage() {
@@ -171,6 +172,103 @@ export default function HomePage() {
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Workspace Analyzer Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <div>
+                <Badge variant="secondary" className="mb-4 animate-fade-in-up">
+                  <Home className="w-4 h-4 mr-2" />
+                  AI Workspace Analysis
+                </Badge>
+                <h2 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up [animation-delay:0.2s]">
+                  Perfect Your <span className="text-primary">Workspace</span> Design
+                </h2>
+                <p className="text-xl text-muted-foreground mb-8 animate-fade-in-up [animation-delay:0.4s]">
+                  Professional interior design meets ergonomic science. Upload your workspace photo and get AI-powered analysis with personalized furniture recommendations for better posture and productivity.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 animate-fade-in-up [animation-delay:0.6s]">
+                <div className="text-center p-4 bg-background/50 backdrop-blur-sm rounded-lg border border-border/50">
+                  <div className="text-2xl font-bold text-primary mb-2">1.2K+</div>
+                  <div className="text-sm text-muted-foreground">Workspaces Analyzed</div>
+                </div>
+                <div className="text-center p-4 bg-background/50 backdrop-blur-sm rounded-lg border border-border/50">
+                  <div className="text-2xl font-bold text-primary mb-2">94%</div>
+                  <div className="text-sm text-muted-foreground">Ergonomic Improvement</div>
+                </div>
+                <div className="text-center p-4 bg-background/50 backdrop-blur-sm rounded-lg border border-border/50">
+                  <div className="text-2xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-sm text-muted-foreground">Product Recommendations</div>
+                </div>
+                <div className="text-center p-4 bg-background/50 backdrop-blur-sm rounded-lg border border-border/50">
+                  <div className="text-2xl font-bold text-primary mb-2">4.9★</div>
+                  <div className="text-sm text-muted-foreground">User Satisfaction</div>
+                </div>
+              </div>
+
+              <div className="animate-fade-in-up [animation-delay:0.8s]">
+                <Link href="/workspace">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 mr-4">
+                    <Camera className="w-5 h-5 mr-2" />
+                    Analyze My Workspace
+                  </Button>
+                </Link>
+                <Button variant="outline" size="lg">
+                  <Eye className="w-5 h-5 mr-2" />
+                  View Demo
+                </Button>
+              </div>
+            </div>
+
+            <div className="animate-fade-in-up [animation-delay:0.4s]">
+              <Card className="p-6 bg-background/80 backdrop-blur-sm border border-border/50">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Live Analysis Preview</h3>
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  </div>
+
+                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center mb-6">
+                    <div className="text-center">
+                      <Camera className="w-12 h-12 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-medium">Workspace Camera Feed</p>
+                      <p className="text-xs text-muted-foreground">AI analysis in real-time</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { metric: "Monitor Distance", value: "24 inches", status: "Perfect", color: "text-green-500" },
+                      { metric: "Screen Height", value: "Eye Level", status: "Optimal", color: "text-green-500" },
+                      { metric: "Lighting Quality", value: "Good", status: "Minor Issues", color: "text-yellow-500" },
+                      { metric: "Chair Support", value: "Needs Work", status: "Upgrade Needed", color: "text-red-500" },
+                      { metric: "Desk Organization", value: "87%", status: "Excellent", color: "text-green-500" },
+                      { metric: "Color Psychology", value: "Focus Ready", status: "Optimized", color: "text-blue-500" }
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div>
+                          <div className="font-medium text-sm">{item.metric}</div>
+                          <div className="text-xs text-muted-foreground">{item.status}</div>
+                        </div>
+                        <div className={`font-bold text-sm ${item.color}`}>{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="text-center pt-4 border-t border-border">
+                    <div className="text-2xl font-bold text-primary mb-1">87/100</div>
+                    <div className="text-sm text-muted-foreground">Overall Workspace Score</div>
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         </div>
