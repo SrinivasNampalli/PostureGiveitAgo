@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { analyticsService, SessionData, UserStats } from '@/lib/analytics'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface AnalyticsContextType {
   stats: UserStats
@@ -16,9 +17,20 @@ interface AnalyticsContextType {
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined)
 
 export function AnalyticsProvider({ children }: { children: ReactNode }) {
+  const { currentUser } = useAuth()
   const [stats, setStats] = useState<UserStats>(analyticsService.getStats())
   const [recentSessions, setRecentSessions] = useState<SessionData[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  // Update analytics service when user changes
+  useEffect(() => {
+    if (currentUser) {
+      analyticsService.setCurrentUser(currentUser.id)
+    } else {
+      analyticsService.setCurrentUser(null)
+    }
+    refreshStats()
+  }, [currentUser])
 
   const refreshStats = () => {
     setIsLoading(true)

@@ -10,10 +10,11 @@ import {
   CommunityStats,
   Comment
 } from '@/lib/community'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface CommunityContextType {
   // User
-  currentUser: User
+  currentUser: User | null
   updateCurrentUser: (user: Partial<User>) => void
 
   // Posts
@@ -52,7 +53,8 @@ interface CommunityContextType {
 const CommunityContext = createContext<CommunityContextType | undefined>(undefined)
 
 export function CommunityProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(communityService.getCurrentUser())
+  const { currentUser: authUser, isAuthenticated } = useAuth()
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [groups, setGroups] = useState<Group[]>([])
@@ -66,10 +68,30 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
   })
   const [isLoading, setIsLoading] = useState(true)
 
-  // Initialize data
+  // Initialize data when auth user changes
   useEffect(() => {
-    refreshAll()
-  }, [])
+    // Initialize the service in the browser
+    communityService.initializeInBrowser()
+
+    if (authUser) {
+      // Set the current user for the community service
+      communityService.setCurrentUser(authUser.id)
+
+      // Create or get community user profile
+      let communityUser = communityService.getUserById(authUser.id)
+      if (!communityUser) {
+        communityUser = communityService.createCommunityUser(authUser)
+      }
+
+      setCurrentUser(communityUser)
+      refreshAll()
+    } else {
+      // Guest mode
+      communityService.setCurrentUser(null)
+      setCurrentUser(null)
+      refreshAll()
+    }
+  }, [authUser])
 
   const refreshAll = async () => {
     setIsLoading(true)
@@ -89,9 +111,22 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
   }
 
   const updateCurrentUser = (userData: Partial<User>) => {
+    if (!currentUser) return
+
     const updatedUser = { ...currentUser, ...userData }
     setCurrentUser(updatedUser)
-    communityService.saveCurrentUser(updatedUser)
+
+    // Save to community users storage
+    try {
+      const users = communityService.getUsers()
+      const userIndex = users.findIndex(u => u.id === updatedUser.id)
+      if (userIndex >= 0) {
+        users[userIndex] = updatedUser
+        communityService.saveUsers(users)
+      }
+    } catch (error) {
+      console.error('Error updating user:', error)
+    }
   }
 
   const refreshPosts = async () => {

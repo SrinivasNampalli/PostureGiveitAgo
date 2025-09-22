@@ -4,12 +4,13 @@ import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import { AnalyticsProvider } from '@/contexts/AnalyticsContext'
 import { CommunityProvider } from '@/contexts/CommunityContext'
+import { AuthProvider } from '@/contexts/AuthContext'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'PosturePro - AI-Powered Posture & Fitness Coach',
+  description: 'Transform your posture and fitness with AI-powered real-time analysis, personalized exercises, and an engaging community',
+  generator: 'PosturePro',
 }
 
 export default function RootLayout({
@@ -20,11 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <AnalyticsProvider>
-          <CommunityProvider>
-            {children}
-          </CommunityProvider>
-        </AnalyticsProvider>
+        <AuthProvider>
+          <AnalyticsProvider>
+            <CommunityProvider>
+              {children}
+            </CommunityProvider>
+          </AnalyticsProvider>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import PostureAnalyzer from "@/components/PostureAnalyzer"
 import Link from "next/link"
+import { useAuth } from "@/contexts/AuthContext"
 import {
   ArrowRight,
   Target,
@@ -18,9 +19,12 @@ import {
   Brain,
   Dumbbell,
   Eye,
+  LogOut,
+  User,
 } from "lucide-react"
 
 export default function HomePage() {
+  const { currentUser, isAuthenticated, logout } = useAuth()
   const observerRef = useRef<IntersectionObserver | null>(null)
   const [liveUsers, setLiveUsers] = useState(247)
   const [totalUsers, setTotalUsers] = useState(12847)
@@ -63,7 +67,7 @@ export default function HomePage() {
         <div className="fixed inset-0 bg-background z-50 p-4 overflow-y-auto animate-fade-in-up">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-6 animate-fade-in-left">
-              <h1 className="text-3xl font-bold gradient-text">AI Fitness Tracker</h1>
+              <h1 className="text-3xl font-bold gradient-text">PosturePro</h1>
               <Button
                 variant="outline"
                 onClick={() => setShowPostureAnalyzer(false)}
@@ -76,6 +80,40 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      {/* Header with User Info */}
+      {isAuthenticated && (
+        <div className="fixed top-4 right-4 z-40">
+          <div className="flex items-center space-x-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+                {currentUser?.avatar || "U"}
+              </div>
+              <span className="text-sm font-medium">{currentUser?.username}</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={logout}
+              className="hover:bg-red-500/10 hover:text-red-600"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {!isAuthenticated && (
+        <div className="fixed top-4 right-4 z-40">
+          <Link href="/login">
+            <Button variant="outline" className="bg-background/80 backdrop-blur-sm">
+              <User className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
+          </Link>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5"></div>
@@ -87,12 +125,12 @@ export default function HomePage() {
             </Badge>
 
             <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold text-balance mb-8 animate-fade-in-up [animation-delay:0.2s]">
-              Your <span className="text-primary">AI Fitness</span> Journey Starts Here
+              Perfect Your <span className="text-primary">Posture</span> with AI
             </h1>
 
             <p className="text-xl text-muted-foreground max-w-4xl mx-auto mb-12 text-pretty animate-fade-in-up [animation-delay:0.4s]">
-              Real-time posture analysis, exercise counting, and form correction powered by advanced computer vision.
-              Transform your fitness routine with intelligent motion tracking that adapts to your body.
+              Real-time posture analysis, exercise tracking, and form correction powered by advanced AI.
+              Transform your posture and build healthy habits with intelligent motion tracking and personalized guidance.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up [animation-delay:0.6s]">
@@ -549,7 +587,7 @@ export default function HomePage() {
             <div className="scroll-reveal slide-in-right-dramatic">
               <h3 className="text-3xl font-bold mb-8">Ready to start your journey?</h3>
               <p className="text-lg text-muted-foreground mb-8">
-                Join thousands of users who have transformed their fitness routine with AI-powered tracking. Your data
+                Join thousands of users who have transformed their posture and fitness with PosturePro. Your data
                 stays private and secure - all processing happens locally in your browser.
               </p>
 
@@ -594,10 +632,10 @@ export default function HomePage() {
       <section className="py-40 px-4 sm:px-6 lg:px-8 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl md:text-7xl font-bold mb-12 scroll-reveal slide-in-down-dramatic">
-            Ready to transform your fitness?
+            Ready to perfect your posture?
           </h2>
           <p className="text-2xl mb-16 opacity-90 scroll-reveal fade-in-dramatic">
-            Experience the future of AI-powered fitness tracking with real-time analysis and personalized insights.
+            Experience the future of posture improvement with AI-powered analysis and personalized guidance.
           </p>
           <div className="scroll-reveal scale-in-dramatic">
             <Button

@@ -308,10 +308,12 @@ export default function ExercisesPage() {
                   <span>{plan.exercises} exercises</span>
                   <Badge className={getDifficultyColor(plan.difficulty)}>{plan.difficulty}</Badge>
                 </div>
-                <Button className="w-full mt-4">
-                  <Play className="w-4 h-4 mr-2" />
-                  Start Plan
-                </Button>
+                <Link href={`/plans/${plan.id}`}>
+                  <Button className="w-full mt-4">
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Plan
+                  </Button>
+                </Link>
               </Card>
             ))}
           </div>
@@ -451,10 +453,12 @@ export default function ExercisesPage() {
                     </div>
                   )}
 
-                  <Button className="w-full">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    View Exercise Details
-                  </Button>
+                  <Link href={`/exercises/${exercise.id}`}>
+                    <Button className="w-full">
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      View Exercise Details
+                    </Button>
+                  </Link>
                 </div>
               </Card>
             ))}

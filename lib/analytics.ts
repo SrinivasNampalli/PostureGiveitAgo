@@ -53,8 +53,19 @@ export interface UserGoal {
 }
 
 class AnalyticsService {
-  private storageKey = 'fitness-analytics'
-  private sessionsKey = 'fitness-sessions'
+  private currentUserId: string | null = null
+
+  private getStorageKeys(userId?: string) {
+    const uid = userId || this.currentUserId || 'guest'
+    return {
+      stats: `fitness-analytics-${uid}`,
+      sessions: `fitness-sessions-${uid}`
+    }
+  }
+
+  setCurrentUser(userId: string | null) {
+    this.currentUserId = userId
+  }
 
   // Save session data
   saveSession(sessionData: Omit<SessionData, 'id' | 'date'>): SessionData {
@@ -66,7 +77,8 @@ class AnalyticsService {
 
     const sessions = this.getSessions()
     sessions.push(session)
-    localStorage.setItem(this.sessionsKey, JSON.stringify(sessions))
+    const storageKeys = this.getStorageKeys()
+    localStorage.setItem(storageKeys.sessions, JSON.stringify(sessions))
 
     // Update stats
     this.updateStats(session)
@@ -77,7 +89,8 @@ class AnalyticsService {
   // Get all sessions
   getSessions(): SessionData[] {
     try {
-      const sessions = localStorage.getItem(this.sessionsKey)
+      const storageKeys = this.getStorageKeys()
+      const sessions = localStorage.getItem(storageKeys.sessions)
       if (!sessions) return []
       return JSON.parse(sessions).map((s: any) => ({
         ...s,
@@ -92,7 +105,8 @@ class AnalyticsService {
   // Get user stats
   getStats(): UserStats {
     try {
-      const stats = localStorage.getItem(this.storageKey)
+      const storageKeys = this.getStorageKeys()
+      const stats = localStorage.getItem(storageKeys.stats)
       if (!stats) return this.getDefaultStats()
 
       const parsed = JSON.parse(stats)
@@ -134,7 +148,8 @@ class AnalyticsService {
     // Update goals
     stats.goals = this.updateGoals(stats.goals, session)
 
-    localStorage.setItem(this.storageKey, JSON.stringify(stats))
+    const storageKeys = this.getStorageKeys()
+    localStorage.setItem(storageKeys.stats, JSON.stringify(stats))
   }
 
   private calculateCurrentStreak(sessions: SessionData[]): number {
@@ -388,8 +403,9 @@ class AnalyticsService {
 
   // Clear all data (for testing)
   clearAllData() {
-    localStorage.removeItem(this.storageKey)
-    localStorage.removeItem(this.sessionsKey)
+    const storageKeys = this.getStorageKeys()
+    localStorage.removeItem(storageKeys.stats)
+    localStorage.removeItem(storageKeys.sessions)
   }
 
   // Seed with sample data for demo

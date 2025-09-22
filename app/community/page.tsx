@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useCommunity } from "@/contexts/CommunityContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -32,10 +33,13 @@ import {
   CheckCircle,
   Zap,
   Globe,
-  X
+  X,
+  LogOut,
+  User
 } from "lucide-react"
 
 export default function CommunityPage() {
+  const { currentUser: authUser, isAuthenticated, logout } = useAuth()
   const {
     currentUser,
     posts,
@@ -57,6 +61,59 @@ export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState("feed")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [newPostText, setNewPostText] = useState("")
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set())
+  const [newComments, setNewComments] = useState<Record<string, string>>({})
+
+  const toggleComments = (postId: string) => {
+    const newExpanded = new Set(expandedComments)
+    if (newExpanded.has(postId)) {
+      newExpanded.delete(postId)
+    } else {
+      newExpanded.add(postId)
+    }
+    setExpandedComments(newExpanded)
+  }
+
+  const handleAddComment = (postId: string) => {
+    const commentText = newComments[postId]
+    if (commentText && commentText.trim()) {
+      addComment(postId, commentText.trim())
+      setNewComments(prev => ({ ...prev, [postId]: '' }))
+    }
+  }
+
+  const updateCommentText = (postId: string, text: string) => {
+    setNewComments(prev => ({ ...prev, [postId]: text }))
+  }
+
+  // Show login prompt if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <Users className="w-16 h-16 text-primary mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-4">Join the Community</h1>
+          <p className="text-muted-foreground mb-6">
+            Sign in to connect with thousands of fitness enthusiasts, share your progress, and stay motivated together.
+          </p>
+          <div className="space-y-3">
+            <Link href="/login">
+              <Button className="w-full">
+                <User className="w-4 h-4 mr-2" />
+                Sign In / Sign Up
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" className="w-full">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Show loading if user is not yet loaded
   if (!currentUser) {
@@ -232,9 +289,25 @@ export default function CommunityPage() {
                 Back to Home
               </Button>
             </Link>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-muted-foreground">{(communityStats.onlineMembers / 1000).toFixed(1)}K members online</span>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-muted-foreground">{(communityStats.onlineMembers / 1000).toFixed(1)}K members online</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-background/20 rounded-lg p-2">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-xs">
+                  {authUser?.avatar || "U"}
+                </div>
+                <span className="text-sm font-medium">{authUser?.username}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={logout}
+                  className="hover:bg-red-500/10 hover:text-red-400"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -450,7 +523,12 @@ export default function CommunityPage() {
                         <Heart className="w-4 h-4 mr-2" />
                         {post.likes}
                       </Button>
-                      <Button variant="ghost" size="sm" className="hover:text-blue-500">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hover:text-blue-500"
+                        onClick={() => toggleComments(post.id)}
+                      >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         {post.comments.length}
                       </Button>
@@ -460,6 +538,64 @@ export default function CommunityPage() {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Comments Section */}
+                  {expandedComments.has(post.id) && (
+                    <div className="px-6 pb-6 border-t border-border">
+                      {/* Existing Comments */}
+                      {post.comments.length > 0 && (
+                        <div className="space-y-4 mb-4 mt-4">
+                          {post.comments.map((comment) => (
+                            <div key={comment.id} className="flex space-x-3">
+                              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+                                {comment.user?.avatar || "U"}
+                              </div>
+                              <div className="flex-1">
+                                <div className="bg-muted p-3 rounded-lg">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <span className="font-medium text-sm">{comment.user?.name || "User"}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {formatTimestamp(comment.timestamp)}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm">{comment.content}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add Comment */}
+                      <div className="flex space-x-3 mt-4">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+                          {currentUser?.avatar || "U"}
+                        </div>
+                        <div className="flex-1 flex space-x-2">
+                          <input
+                            type="text"
+                            placeholder="Write a comment..."
+                            className="flex-1 px-3 py-2 border border-border rounded-lg bg-background text-sm"
+                            value={newComments[post.id] || ''}
+                            onChange={(e) => updateCommentText(post.id, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault()
+                                handleAddComment(post.id)
+                              }
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => handleAddComment(post.id)}
+                            disabled={!newComments[post.id]?.trim()}
+                          >
+                            <Send className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </Card>
               ))}
             </div>

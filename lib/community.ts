@@ -91,64 +91,84 @@ export interface CommunityStats {
 }
 
 class CommunityService {
-  private storageKeys = {
-    posts: 'community-posts',
-    users: 'community-users',
-    challenges: 'community-challenges',
-    groups: 'community-groups',
-    currentUser: 'community-current-user',
-    stats: 'community-stats'
+  private currentUserId: string | null = null
+  private initialized = false
+
+  constructor() {
+    this.initializeService()
   }
 
-  // Initialize current user or get existing
-  getCurrentUser(): User {
-    try {
-      const stored = localStorage.getItem(this.storageKeys.currentUser)
-      if (stored) {
-        const user = JSON.parse(stored)
-        return {
-          ...user,
-          joinedDate: new Date(user.joinedDate)
-        }
-      }
+  private initializeService(): void {
+    if (this.initialized || typeof window === 'undefined') return
 
-      // Create default user
-      const defaultUser: User = {
-        id: this.generateId(),
-        name: "You",
-        avatar: "Y",
-        level: "Beginner",
-        streak: 0,
-        location: "Your Location",
-        score: 0,
-        joinedDate: new Date()
-      }
+    // Clean up old user-scoped posts from previous implementation (browser only)
+    this.clearOldUserScopedPosts()
+    this.initialized = true
+  }
 
-      this.saveCurrentUser(defaultUser)
-      return defaultUser
-    } catch {
-      const defaultUser: User = {
-        id: this.generateId(),
-        name: "You",
-        avatar: "Y",
-        level: "Beginner",
-        streak: 0,
-        location: "Your Location",
-        score: 0,
-        joinedDate: new Date()
-      }
-      return defaultUser
+  getStorageKeys(userId?: string) {
+    const uid = userId || this.currentUserId || 'guest'
+    return {
+      posts: 'community-posts', // Global posts - all users see all posts
+      users: 'community-users', // Global users list
+      challenges: 'community-challenges', // Global challenges - all users see same challenges
+      groups: 'community-groups', // Global groups - all users see same groups
+      userProgress: `community-progress-${uid}`, // User-specific progress
+      stats: 'community-stats' // Global stats
     }
   }
 
-  saveCurrentUser(user: User): void {
-    localStorage.setItem(this.storageKeys.currentUser, JSON.stringify(user))
+  setCurrentUser(userId: string | null) {
+    this.currentUserId = userId
+  }
+
+  // Initialize the service in the browser (call this from client-side components)
+  initializeInBrowser(): void {
+    if (typeof window !== 'undefined' && !this.initialized) {
+      this.clearOldUserScopedPosts()
+      this.initialized = true
+    }
+  }
+
+  // Get user by ID from auth system
+  getUserById(userId: string): User | null {
+    try {
+      const users = this.getUsers()
+      return users.find(u => u.id === userId) || null
+    } catch {
+      return null
+    }
+  }
+
+  // Convert auth user to community user format
+  createCommunityUser(authUser: { id: string; username: string; avatar: string; createdAt: Date }): User {
+    const communityUser = {
+      id: authUser.id,
+      name: authUser.username,
+      avatar: authUser.avatar,
+      level: "Beginner" as const,
+      streak: 0,
+      location: "Your Location",
+      score: 0,
+      joinedDate: authUser.createdAt
+    }
+
+    // Add user to community users if not exists
+    const users = this.getUsers()
+    const existingUser = users.find(u => u.id === authUser.id)
+    if (!existingUser) {
+      users.push(communityUser)
+      this.saveUsers(users)
+    }
+
+    return existingUser || communityUser
   }
 
   // Posts management
   getPosts(): Post[] {
     try {
-      const posts = localStorage.getItem(this.storageKeys.posts)
+      const storageKeys = this.getStorageKeys()
+      const posts = localStorage.getItem(storageKeys.posts)
       if (!posts) return this.getDefaultPosts()
 
       return JSON.parse(posts).map((post: any) => ({
@@ -232,7 +252,8 @@ class CommunityService {
   // Challenges management
   getChallenges(): Challenge[] {
     try {
-      const challenges = localStorage.getItem(this.storageKeys.challenges)
+      const storageKeys = this.getStorageKeys()
+      const challenges = localStorage.getItem(storageKeys.challenges)
       if (!challenges) return this.getDefaultChallenges()
 
       return JSON.parse(challenges).map((challenge: any) => ({
@@ -269,7 +290,8 @@ class CommunityService {
   // Groups management
   getGroups(): Group[] {
     try {
-      const groups = localStorage.getItem(this.storageKeys.groups)
+      const storageKeys = this.getStorageKeys()
+      const groups = localStorage.getItem(storageKeys.groups)
       if (!groups) return this.getDefaultGroups()
 
       return JSON.parse(groups).map((group: any) => ({
@@ -343,24 +365,43 @@ class CommunityService {
 
   // Private helper methods
   private savePosts(posts: Post[]): void {
-    localStorage.setItem(this.storageKeys.posts, JSON.stringify(posts))
+    const storageKeys = this.getStorageKeys()
+    localStorage.setItem(storageKeys.posts, JSON.stringify(posts))
   }
 
   private saveChallenges(challenges: Challenge[]): void {
-    localStorage.setItem(this.storageKeys.challenges, JSON.stringify(challenges))
+    const storageKeys = this.getStorageKeys()
+    localStorage.setItem(storageKeys.challenges, JSON.stringify(challenges))
   }
 
   private saveGroups(groups: Group[]): void {
-    localStorage.setItem(this.storageKeys.groups, JSON.stringify(groups))
+    const storageKeys = this.getStorageKeys()
+    localStorage.setItem(storageKeys.groups, JSON.stringify(groups))
   }
 
-  private getUsers(): User[] {
-    // In a real app, this would be a separate API
-    // For now, we'll generate some mock users plus the current user
-    const currentUser = this.getCurrentUser()
-    const mockUsers = this.getDefaultUsers()
+  getUsers(): User[] {
+    try {
+      const storageKeys = this.getStorageKeys()
+      const users = localStorage.getItem(storageKeys.users)
+      if (users) {
+        return JSON.parse(users).map((user: any) => ({
+          ...user,
+          joinedDate: new Date(user.joinedDate)
+        }))
+      }
 
-    return [currentUser, ...mockUsers]
+      // Initialize with default users if none exist
+      const defaultUsers = this.getDefaultUsers()
+      this.saveUsers(defaultUsers)
+      return defaultUsers
+    } catch {
+      return this.getDefaultUsers()
+    }
+  }
+
+  saveUsers(users: User[]): void {
+    const storageKeys = this.getStorageKeys()
+    localStorage.setItem(storageKeys.users, JSON.stringify(users))
   }
 
   private generateId(): string {
@@ -529,9 +570,43 @@ class CommunityService {
 
   // Clear all data (for testing)
   clearAllData(): void {
-    Object.values(this.storageKeys).forEach(key => {
+    const storageKeys = this.getStorageKeys()
+    Object.values(storageKeys).forEach(key => {
       localStorage.removeItem(key)
     })
+
+    // Also clear any old user-scoped posts that might exist
+    this.clearOldUserScopedPosts()
+  }
+
+  // Clear old user-scoped posts from previous implementation
+  private clearOldUserScopedPosts(): void {
+    // Only run in browser environment
+    if (typeof window === 'undefined') return
+
+    const keysToRemove: string[] = []
+
+    // Check all localStorage keys for old user-scoped data
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key) {
+        // Remove old user-scoped posts
+        if (key.startsWith('community-posts-') && key !== 'community-posts') {
+          keysToRemove.push(key)
+        }
+        // Remove old user-scoped challenges
+        if (key.startsWith('community-challenges-') && key !== 'community-challenges') {
+          keysToRemove.push(key)
+        }
+        // Remove old user-scoped groups
+        if (key.startsWith('community-groups-') && key !== 'community-groups') {
+          keysToRemove.push(key)
+        }
+      }
+    }
+
+    // Remove old user-scoped keys
+    keysToRemove.forEach(key => localStorage.removeItem(key))
   }
 
   // Seed sample data
