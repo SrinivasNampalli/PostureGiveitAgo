@@ -55,6 +55,7 @@ export default function CommunityPage() {
     communityStats,
     seedSampleData,
     clearAllData,
+    debugPosts,
     isLoading
   } = useCommunity()
 
@@ -342,6 +343,9 @@ export default function CommunityPage() {
             <Button onClick={clearAllData} variant="outline" size="sm">
               <X className="w-4 h-4 mr-2" />
               Clear All Data
+            </Button>
+            <Button onClick={debugPosts} variant="outline" size="sm">
+              🐛 Debug Posts
             </Button>
           </div>
         </div>

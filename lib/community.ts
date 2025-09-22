@@ -127,7 +127,17 @@ class CommunityService {
     if (typeof window !== 'undefined' && !this.initialized) {
       this.clearOldUserScopedPosts()
       this.initialized = true
+      console.log('Community service initialized, using storage key:', this.getStorageKeys().posts)
     }
+  }
+
+  // Debug method to check current posts
+  debugPosts(): void {
+    if (typeof window === 'undefined') return
+    const storageKeys = this.getStorageKeys()
+    console.log('Current storage key for posts:', storageKeys.posts)
+    console.log('Posts in storage:', localStorage.getItem(storageKeys.posts))
+    console.log('All localStorage keys:', Object.keys(localStorage))
   }
 
   // Get user by ID from auth system
@@ -167,6 +177,12 @@ class CommunityService {
   // Posts management
   getPosts(): Post[] {
     try {
+      // Always ensure cleanup has happened in browser
+      if (typeof window !== 'undefined' && !this.initialized) {
+        this.clearOldUserScopedPosts()
+        this.initialized = true
+      }
+
       const storageKeys = this.getStorageKeys()
       const posts = localStorage.getItem(storageKeys.posts)
       if (!posts) return this.getDefaultPosts()

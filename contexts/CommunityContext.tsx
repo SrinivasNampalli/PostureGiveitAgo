@@ -47,6 +47,7 @@ interface CommunityContextType {
   // Utility
   seedSampleData: () => void
   clearAllData: () => void
+  debugPosts: () => void
   isLoading: boolean
 }
 
@@ -165,8 +166,23 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
 
   const addComment = (postId: string, content: string) => {
     try {
-      communityService.addComment(postId, content, currentUser)
-      refreshPosts()
+      if (!currentUser) return
+
+      const newComment = communityService.addComment(postId, content, currentUser)
+
+      // Update the local posts state immediately
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.id === postId
+            ? { ...post, comments: [...post.comments, newComment] }
+            : post
+        )
+      )
+
+      // Force a refresh to ensure persistence
+      setTimeout(() => {
+        refreshPosts()
+      }, 100)
 
       // Update user score for engagement
       updateCurrentUser({ score: currentUser.score + 5 })
@@ -265,8 +281,11 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
 
   const clearAllData = () => {
     communityService.clearAllData()
-    setCurrentUser(communityService.getCurrentUser())
     refreshAll()
+  }
+
+  const debugPosts = () => {
+    communityService.debugPosts()
   }
 
   const value: CommunityContextType = {
@@ -291,6 +310,7 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     refreshStats,
     seedSampleData,
     clearAllData,
+    debugPosts,
     isLoading
   }
 
