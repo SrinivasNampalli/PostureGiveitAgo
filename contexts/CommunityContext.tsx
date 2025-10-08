@@ -94,6 +94,29 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     }
   }, [authUser])
 
+  // Set up real-time subscriptions
+  useEffect(() => {
+    console.log('Setting up real-time subscriptions...')
+
+    // Subscribe to posts changes
+    const unsubscribePosts = communityService.subscribeToPostsChanges((payload) => {
+      console.log('Posts changed:', payload)
+      refreshPosts()
+    })
+
+    // Subscribe to comments changes
+    const unsubscribeComments = communityService.subscribeToCommentsChanges((payload) => {
+      console.log('Comments changed:', payload)
+      refreshPosts()
+    })
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      unsubscribePosts()
+      unsubscribeComments()
+    }
+  }, [])
+
   const refreshAll = async () => {
     setIsLoading(true)
     try {
@@ -132,16 +155,16 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
 
   const refreshPosts = async () => {
     try {
-      const newPosts = communityService.getPosts()
+      const newPosts = await communityService.getPosts()
       setPosts(newPosts)
     } catch (error) {
       console.error('Error refreshing posts:', error)
     }
   }
 
-  const createPost = (postData: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares' | 'likedBy' | 'user' | 'userId'>) => {
+  const createPost = async (postData: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares' | 'likedBy' | 'user' | 'userId'>) => {
     try {
-      const newPost = communityService.createPost({
+      const newPost = await communityService.createPost({
         ...postData,
         userId: currentUser.id,
         user: currentUser
@@ -155,20 +178,21 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const likePost = (postId: string) => {
+  const likePost = async (postId: string) => {
     try {
-      communityService.likePost(postId, currentUser.id)
-      refreshPosts()
+      await communityService.likePost(postId, currentUser.id)
+      // Refresh posts to get updated state
+      await refreshPosts()
     } catch (error) {
       console.error('Error liking post:', error)
     }
   }
 
-  const addComment = (postId: string, content: string) => {
+  const addComment = async (postId: string, content: string) => {
     try {
       if (!currentUser) return
 
-      const newComment = communityService.addComment(postId, content, currentUser)
+      const newComment = await communityService.addComment(postId, content, currentUser)
 
       // Update the local posts state immediately
       setPosts(prevPosts =>
@@ -180,8 +204,8 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
       )
 
       // Force a refresh to ensure persistence
-      setTimeout(() => {
-        refreshPosts()
+      setTimeout(async () => {
+        await refreshPosts()
       }, 100)
 
       // Update user score for engagement

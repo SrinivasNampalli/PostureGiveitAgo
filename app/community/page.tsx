@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { isSupabaseConfigured } from "@/lib/supabase"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -64,6 +65,8 @@ export default function CommunityPage() {
   const [newPostText, setNewPostText] = useState("")
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set())
   const [newComments, setNewComments] = useState<Record<string, string>>({})
+  const [showRealtimeBanner, setShowRealtimeBanner] = useState(true)
+  const supabaseConfigured = isSupabaseConfigured()
 
   const toggleComments = (postId: string) => {
     const newExpanded = new Set(expandedComments)
@@ -352,6 +355,58 @@ export default function CommunityPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Real-time Setup Banner */}
+        {!supabaseConfigured && showRealtimeBanner && (
+          <Card className="mb-6 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-2 border-blue-500/30">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Zap className="w-5 h-5 text-blue-500" />
+                  <h3 className="text-lg font-bold">Enable Real-Time Multi-User Chat! 🚀</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Currently using <strong>localStorage</strong> - posts only visible on this computer.
+                  Set up Supabase (free!) to enable real-time sync across all users and devices!
+                </p>
+                <div className="flex items-center space-x-3">
+                  <a href="/SETUP-REALTIME-CHAT.md" target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Setup Guide
+                    </Button>
+                  </a>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowRealtimeBanner(false)}
+                  >
+                    Maybe Later
+                  </Button>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowRealtimeBanner(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* Mode Indicator */}
+        {supabaseConfigured && (
+          <Card className="mb-6 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-2 border-green-500/30">
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                🚀 Real-Time Mode Active - All users see your posts instantly!
+              </span>
+            </div>
+          </Card>
+        )}
 
         {/* Navigation Tabs */}
         <div className="flex space-x-1 mb-8 p-1 bg-muted rounded-lg">

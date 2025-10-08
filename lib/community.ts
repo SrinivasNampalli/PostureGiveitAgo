@@ -1,4 +1,5 @@
 // Community service for managing posts, challenges, and interactions
+import { supabase, isSupabaseConfigured } from './supabase'
 
 export interface User {
   id: string
@@ -175,7 +176,100 @@ class CommunityService {
   }
 
   // Posts management
-  getPosts(): Post[] {
+  async getPosts(): Promise<Post[]> {
+    try {
+      // Try Supabase first if configured
+      if (isSupabaseConfigured()) {
+        return await this.getPostsFromSupabase()
+      }
+
+      // Fallback to localStorage
+      return this.getPostsFromLocalStorage()
+    } catch (error) {
+      console.error('Error getting posts:', error)
+      return this.getPostsFromLocalStorage()
+    }
+  }
+
+  private async getPostsFromSupabase(): Promise<Post[]> {
+    try {
+      // Get posts from Supabase
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (postsError) throw postsError
+
+      // Get comments for all posts
+      const { data: commentsData, error: commentsError } = await supabase
+        .from('comments')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (commentsError) throw commentsError
+
+      // Group comments by post_id
+      const commentsByPost = (commentsData || []).reduce((acc: any, comment: any) => {
+        if (!acc[comment.post_id]) {
+          acc[comment.post_id] = []
+        }
+        acc[comment.post_id].push({
+          id: comment.id,
+          userId: comment.user_id,
+          user: {
+            id: comment.user_id,
+            name: comment.user_name,
+            avatar: comment.user_avatar,
+            level: 'Beginner' as const,
+            streak: 0,
+            location: '',
+            score: 0,
+            joinedDate: new Date()
+          },
+          content: comment.content,
+          timestamp: new Date(comment.created_at),
+          likes: comment.likes
+        })
+        return acc
+      }, {})
+
+      // Map posts with their comments
+      const posts: Post[] = (postsData || []).map((post: any) => ({
+        id: post.id,
+        userId: post.user_id,
+        user: {
+          id: post.user_id,
+          name: post.user_name,
+          avatar: post.user_avatar,
+          level: post.user_level,
+          streak: post.user_streak,
+          location: post.user_location,
+          score: 0,
+          joinedDate: new Date()
+        },
+        type: post.type,
+        content: post.content,
+        timestamp: new Date(post.created_at),
+        likes: post.likes,
+        comments: commentsByPost[post.id] || [],
+        shares: post.shares,
+        achievement: post.achievement,
+        progress: post.progress,
+        workout: post.workout,
+        tags: post.tags || [],
+        image: post.image,
+        likedBy: post.liked_by || []
+      }))
+
+      return posts
+    } catch (error) {
+      console.error('Error fetching from Supabase:', error)
+      throw error
+    }
+  }
+
+  private getPostsFromLocalStorage(): Post[] {
     try {
       // Always ensure cleanup has happened in browser
       if (typeof window !== 'undefined' && !this.initialized) {
@@ -208,7 +302,66 @@ class CommunityService {
     }
   }
 
-  createPost(postData: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares' | 'likedBy'>): Post {
+  async createPost(postData: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares' | 'likedBy'>): Promise<Post> {
+    try {
+      // Try Supabase first if configured
+      if (isSupabaseConfigured()) {
+        return await this.createPostInSupabase(postData)
+      }
+
+      // Fallback to localStorage
+      return this.createPostInLocalStorage(postData)
+    } catch (error) {
+      console.error('Error creating post:', error)
+      return this.createPostInLocalStorage(postData)
+    }
+  }
+
+  private async createPostInSupabase(postData: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares' | 'likedBy'>): Promise<Post> {
+    const { data, error } = await supabase
+      .from('posts')
+      .insert({
+        user_id: postData.userId,
+        user_name: postData.user.name,
+        user_avatar: postData.user.avatar,
+        user_level: postData.user.level,
+        user_streak: postData.user.streak,
+        user_location: postData.user.location,
+        type: postData.type,
+        content: postData.content,
+        achievement: postData.achievement || null,
+        progress: postData.progress || null,
+        workout: postData.workout || null,
+        tags: postData.tags || [],
+        image: postData.image || null
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+
+    const newPost: Post = {
+      id: data.id,
+      userId: data.user_id,
+      user: postData.user,
+      type: data.type,
+      content: data.content,
+      timestamp: new Date(data.created_at),
+      likes: data.likes,
+      comments: [],
+      shares: data.shares,
+      achievement: data.achievement,
+      progress: data.progress,
+      workout: data.workout,
+      tags: data.tags || [],
+      image: data.image,
+      likedBy: data.liked_by || []
+    }
+
+    return newPost
+  }
+
+  private createPostInLocalStorage(postData: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares' | 'likedBy'>): Post {
     const newPost: Post = {
       ...postData,
       id: this.generateId(),
@@ -219,15 +372,61 @@ class CommunityService {
       likedBy: []
     }
 
-    const posts = this.getPosts()
+    const posts = this.getPostsFromLocalStorage()
     posts.unshift(newPost)
     this.savePosts(posts)
 
     return newPost
   }
 
-  likePost(postId: string, userId: string): void {
-    const posts = this.getPosts()
+  async likePost(postId: string, userId: string): Promise<void> {
+    try {
+      if (isSupabaseConfigured()) {
+        await this.likePostInSupabase(postId, userId)
+      } else {
+        this.likePostInLocalStorage(postId, userId)
+      }
+    } catch (error) {
+      console.error('Error liking post:', error)
+      this.likePostInLocalStorage(postId, userId)
+    }
+  }
+
+  private async likePostInSupabase(postId: string, userId: string): Promise<void> {
+    // Get current post
+    const { data: post, error: fetchError } = await supabase
+      .from('posts')
+      .select('liked_by, likes')
+      .eq('id', postId)
+      .single()
+
+    if (fetchError) throw fetchError
+
+    const likedBy = post.liked_by || []
+    const isLiked = likedBy.includes(userId)
+
+    let newLikedBy: string[]
+    let newLikes: number
+
+    if (isLiked) {
+      newLikedBy = likedBy.filter((id: string) => id !== userId)
+      newLikes = Math.max(0, post.likes - 1)
+    } else {
+      newLikedBy = [...likedBy, userId]
+      newLikes = post.likes + 1
+    }
+
+    // Update post
+    const { error: updateError } = await supabase
+      .from('posts')
+      .update({ liked_by: newLikedBy, likes: newLikes })
+      .eq('id', postId)
+
+    if (updateError) throw updateError
+  }
+
+  private likePostInLocalStorage(postId: string, userId: string): void {
+    const posts = this.getPostsFromLocalStorage()
     const post = posts.find(p => p.id === postId)
 
     if (post) {
@@ -243,8 +442,48 @@ class CommunityService {
     }
   }
 
-  addComment(postId: string, content: string, user: User): Comment {
-    const posts = this.getPosts()
+  async addComment(postId: string, content: string, user: User): Promise<Comment> {
+    try {
+      if (isSupabaseConfigured()) {
+        return await this.addCommentInSupabase(postId, content, user)
+      } else {
+        return this.addCommentInLocalStorage(postId, content, user)
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error)
+      return this.addCommentInLocalStorage(postId, content, user)
+    }
+  }
+
+  private async addCommentInSupabase(postId: string, content: string, user: User): Promise<Comment> {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert({
+        post_id: postId,
+        user_id: user.id,
+        user_name: user.name,
+        user_avatar: user.avatar,
+        content
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+
+    const comment: Comment = {
+      id: data.id,
+      userId: data.user_id,
+      user,
+      content: data.content,
+      timestamp: new Date(data.created_at),
+      likes: data.likes
+    }
+
+    return comment
+  }
+
+  private addCommentInLocalStorage(postId: string, content: string, user: User): Comment {
+    const posts = this.getPostsFromLocalStorage()
     const post = posts.find(p => p.id === postId)
 
     if (post) {
@@ -634,6 +873,39 @@ class CommunityService {
     this.getChallenges()
     this.getGroups()
     this.getCommunityStats()
+  }
+
+  // Real-time subscriptions
+  subscribeToPostsChanges(callback: (payload: any) => void) {
+    if (!isSupabaseConfigured()) {
+      console.log('Supabase not configured, using localStorage (no real-time updates)')
+      return () => {} // Return empty cleanup function
+    }
+
+    const channel = supabase
+      .channel('posts-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, callback)
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }
+
+  subscribeToCommentsChanges(callback: (payload: any) => void) {
+    if (!isSupabaseConfigured()) {
+      console.log('Supabase not configured, using localStorage (no real-time updates)')
+      return () => {} // Return empty cleanup function
+    }
+
+    const channel = supabase
+      .channel('comments-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, callback)
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }
 }
 
